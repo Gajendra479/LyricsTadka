@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@color/textColor"
+             tools:context="com.vianet.lyricstadka.FragmentLyrics.LyricsList">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:id="@+id/lyricsCatRecycle"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+
+    <ImageView
+        android:layout_width="@dimen/refresh_image_size"
+        android:id="@+id/lyrics_list_refresh"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:background="@drawable/ic_refresh_image"
+        android:layout_height="@dimen/refresh_image_size"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:layout_margin="5dp"
+        android:layout_below="@+id/lyrics_list_refresh"
+        android:id="@+id/error_text"
+        android:visibility="gone"
+        android:layout_height="match_parent"/>
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:id="@+id/progresBarL"
+        android:indeterminate="true"
+        android:visibility="visible"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_gravity="top"
+        android:layout_height="15dp"/>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:id="@+id/bottamBar"
+        android:layout_below="@+id/lyricsCatRecycle"
+        android:visibility="visible"
+        android:indeterminate="true"
+        android:layout_height="wrap_content"/>
+
+
+</RelativeLayout>

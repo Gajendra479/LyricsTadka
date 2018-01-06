@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Bhakti Sangrah</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_saved_lyrics">SavedLyrics</string>
+    <string name="title_activity_recommend__lyrics">Recommend_Lyrics</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Error_TimeOut">Connection Could not be established</string>
+    <string name="AuthFailure">Connection Auth Failure</string>
+    <string name="Server_Error">Server Error Occured</string>
+    <string name="Network">Network Issue Occured</string>
+    <string name="Parsing_error">Data Parsing Problem</string>
+    <string name="data_notfound">No Data Awailable</string>
+</resources>
