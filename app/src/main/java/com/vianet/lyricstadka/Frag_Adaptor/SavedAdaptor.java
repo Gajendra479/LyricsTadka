@@ -10,11 +10,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.vianet.lyricstadka.DataBase.DatabaseHandler;
 import com.vianet.lyricstadka.FragmentLyrics.LyricsCard;
 import com.vianet.lyricstadka.Getter_Setter;
 import com.vianet.lyricstadka.R;
+import com.vianet.lyricstadka.network.ItemClickListener;
+
 import java.util.ArrayList;
 
 /**
@@ -27,50 +31,53 @@ public class SavedAdaptor extends RecyclerView.Adapter<SavedAdaptor.MyViewHolder
     private Context context;
     private ArrayList<Getter_Setter> savedLyrics;
     private DatabaseHandler helper;
-    private  FragmentManager fragmentManager;
+
+    private FragmentManager fragmentManager;
+    private ItemClickListener clickListener;
 
 
-    public SavedAdaptor(Context context , ArrayList<Getter_Setter> savedlist, FragmentManager fragmentManager){
+    public SavedAdaptor(Context context, ArrayList<Getter_Setter> savedlist, FragmentManager fragmentManager) {
 
-        this.context=context;
-        this.savedLyrics=savedlist;
-        this.fragmentManager=fragmentManager;
-        helper =new DatabaseHandler(context);
+        this.context = context;
+        this.savedLyrics = savedlist;
+        this.fragmentManager = fragmentManager;
+        helper = new DatabaseHandler(context);
 
+    }
+
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.clickListener = itemClickListener;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.saved_design_lyrics,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.saved_design_lyrics, parent, false);
         return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
 
-        Getter_Setter getter_setter=savedLyrics.get(position);
+        Getter_Setter getter_setter = savedLyrics.get(position);
         holder.savedLyricsText.setText(getter_setter.getText());
-//        holder.addFavorite.setVisibility(View.GONE);
-        holder.delete_icon.setOnClickListener(new View.OnClickListener() {
+       /* holder.delete_icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.delete_icon.setEnabled(false);
-                helper.deleteDataFromLyrics(savedLyrics.get(holder.getAdapterPosition()).getText());
-                savedLyrics.remove(holder.getAdapterPosition());
-                notifyItemRemoved(holder.getAdapterPosition());
+                if (clickListener != null){
+                    clickListener.onClick(holder.getAdapterPosition());
+                }
             }
-        });
+        });*/
 
         holder.savedLyricsText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 LyricsCard obj = new LyricsCard();
-
                 Bundle bundle1 = new Bundle();
-                bundle1.putString("description",savedLyrics.get(holder.getAdapterPosition()).getDescription());
-                bundle1.putString("text",savedLyrics.get(holder.getAdapterPosition()).getText());
-                bundle1.putString("title",savedLyrics.get(holder.getAdapterPosition()).getHead());
+                bundle1.putString("description", savedLyrics.get(holder.getAdapterPosition()).getDescription());
+                bundle1.putString("lyrics", savedLyrics.get(holder.getAdapterPosition()).getText());
+                bundle1.putString("text", savedLyrics.get(holder.getAdapterPosition()).getHead());
                 obj.setArguments(bundle1);
 
                 FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -80,7 +87,22 @@ public class SavedAdaptor extends RecyclerView.Adapter<SavedAdaptor.MyViewHolder
 
             }
         });
+
     }
+/*
+    public void removeItem(int position) {
+         savedLyrics.remove(position);
+        // notify the item removed by position
+        // to perform recycler view delete animations
+        // NOTE: don't call notifyDataSetChanged()
+        notifyItemRemoved(position);
+    }
+
+    public void restoreItem(Getter_Setter item, int position) {
+        savedLyrics.add(position, item);
+        // notify item added by position
+        notifyItemInserted(position);
+    }*/
 
     @Override
     public int getItemCount() {
@@ -88,15 +110,16 @@ public class SavedAdaptor extends RecyclerView.Adapter<SavedAdaptor.MyViewHolder
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-//        private final TextView addFavorite;
+        public RelativeLayout viewForground, viewBackground;
+        ImageView delete_icon;
         private TextView savedLyricsText;
 
-        ImageView delete_icon;
         public MyViewHolder(View itemView) {
             super(itemView);
-            savedLyricsText= (TextView) itemView.findViewById(R.id.saved_Lyrics_text);
-            delete_icon= (ImageView) itemView.findViewById(R.id.delete_icon);
-//            addFavorite = (TextView) itemView.findViewById(R.id.favoriteIdText);
+            savedLyricsText = (TextView) itemView.findViewById(R.id.saved_Lyrics_text);
+//            delete_icon= (ImageView) itemView.findViewById(R.id.delete_icon);
+            viewForground = (RelativeLayout) itemView.findViewById(R.id.view_foreground);
+            viewBackground = (RelativeLayout) itemView.findViewById(R.id.view_background);
             Typeface customFonts = Typeface.createFromAsset(context.getAssets(), "fonts/gaj.ttf");
             savedLyricsText.setTypeface(customFonts);
         }

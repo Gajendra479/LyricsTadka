@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
+
 import com.vianet.lyricstadka.Getter_Setter;
 
 import java.util.ArrayList;
@@ -30,92 +30,87 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_ID = "id";
     private static final String KEY_HEAD = "head";
     private static final String KEY_DESCRIPTION = "description";
-    private static final String KEY_TEXT="text";
+    private static final String KEY_TEXT = "text";
     private SQLiteDatabase db;
 
-    public DatabaseHandler(Context context){
-        super(context,DATABASE_NAME,null,DATABASE_VERSION);
+    public DatabaseHandler(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        this.db=db;
+        this.db = db;
 
-        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_LYRICS +"("
-                + KEY_ID + " INTEGER PRIMARY KEY, "
-                + KEY_DESCRIPTION +" TEXT, "+ KEY_TEXT +" TEXT, "+ KEY_HEAD + " TEXT " + ")";
+        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_LYRICS + "("
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + KEY_DESCRIPTION + " TEXT, " + KEY_TEXT + " TEXT, " + KEY_HEAD + " TEXT, " + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
 
     }
 
-    public void insertLyrics(String desc , String title ,String subcatname){
+    public void insertLyrics(String desc, String title, String subcatname) {
 
-        db=this.getWritableDatabase();
-
-        ContentValues values =new ContentValues();
-
-        String querry = "select * from "+TABLE_LYRICS;
-        Cursor cursor = db.rawQuery(querry,null);
-        int count =cursor.getCount();
-
-/*        Log.d("databse ",desc);
-        Log.d("databse ",title);
-        Log.d("database ",subcatname);*/
-
-        values.put(KEY_ID,count);
-        values.put(KEY_DESCRIPTION,desc);
-        values.put(KEY_TEXT,title);
-        values.put(KEY_HEAD,subcatname);
-
-        db.insert(TABLE_LYRICS,null,values);
+        db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_DESCRIPTION, desc);
+        values.put(KEY_TEXT, title);
+        values.put(KEY_HEAD, subcatname);
+        db.insert(TABLE_LYRICS, null, values);
         db.close();
 
     }
 
-    public void deleteDataFromLyrics(String title_id){
-        String deleteQuerry ="DELETE FROM " + TABLE_LYRICS + " WHERE " + KEY_TEXT + "= '" + title_id + "'";
-        db=this.getWritableDatabase();
+    public void deleteDataFromLyrics(String title_id) {
+
+        String deleteQuerry = "DELETE FROM " + TABLE_LYRICS + " WHERE " + KEY_TEXT + "= '" + title_id + "'";
+        db = this.getWritableDatabase();
         db.execSQL(deleteQuerry);
         db.close();
+
     }
-/*
-    public int getLyricsCount(){
-        String countQuery="SELECT * FROM "+TABLE_LYRICS;
-        SQLiteDatabase db=this.getReadableDatabase();
-        Cursor cursor=db.rawQuery(countQuery,null);
-        cursor.close();
-        return cursor.getCount();
-    }
-*/
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String querry ="DROP TABLE IF EXIST"+TABLE_LYRICS;
+
+        String querry = "DROP TABLE IF EXIST" + TABLE_LYRICS;
         db.execSQL(querry);
         this.onCreate(db);
+
     }
 
     public ArrayList<Getter_Setter> selectData() {
-        ArrayList<Getter_Setter> list=new ArrayList<>();
-        db=this.getReadableDatabase();
-        Cursor curser =db.rawQuery("SELECT * FROM " +TABLE_LYRICS+ " ORDER BY " +KEY_TEXT+ " DESC ",null);
-        if (curser.moveToFirst()){
-            do {
-                try {
-                    Getter_Setter data=new Getter_Setter();
-                    data.setId(curser.getString(0));
-                    data.setDescription(curser.getString(1));
-                    data.setText(curser.getString(2));
-                    data.setHead(curser.getString(3));
+        ArrayList<Getter_Setter> list = new ArrayList<>();
+        try {
 
-                    list.add(data);
+            db = this.getReadableDatabase();
+//            Cursor curser = db.rawQuery("SELECT * FROM " + TABLE_LYRICS + " ORDER BY " + KEY_TEXT + " ASC ", null);
+            Cursor curser = db.rawQuery("SELECT * FROM " + TABLE_LYRICS + " ORDER BY " + KEY_ID + " DESC ", null);
+            if (curser.moveToFirst()) {
+                do {
 
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }while (curser.moveToNext());
+                    try {
+
+
+                        Getter_Setter data = new Getter_Setter();
+
+                        data.setId(curser.getString(0));
+                        data.setDescription(curser.getString(1));
+                        data.setText(curser.getString(2));
+                        data.setHead(curser.getString(3));
+                        list.add(data);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } while (curser.moveToNext());
+
+            }
+            curser.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        curser.close();
         return list;
     }
 }

@@ -23,30 +23,30 @@
 
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
         android:layout_margin="5dp"
         android:layout_below="@+id/lyrics_list_refresh"
         android:id="@+id/error_text"
         android:visibility="gone"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"/>
 
     <ProgressBar
         android:layout_width="match_parent"
         android:id="@+id/progresBarL"
         android:indeterminate="true"
-        android:visibility="visible"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_gravity="top"
-        android:layout_height="15dp"/>
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:layout_height="wrap_content"/>
 
     <ProgressBar
         android:layout_width="wrap_content"
-        android:id="@+id/bottamBar"
-        android:layout_below="@+id/lyricsCatRecycle"
-        android:visibility="visible"
-        android:indeterminate="true"
+        android:id="@+id/bottamBarProgressBar"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/circle_image"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
         android:layout_height="wrap_content"/>
 
 

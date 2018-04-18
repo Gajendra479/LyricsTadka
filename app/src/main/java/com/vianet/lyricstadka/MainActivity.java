@@ -1,11 +1,8 @@
 package com.vianet.lyricstadka;
 
-import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +11,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,22 +22,16 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
-import android.text.style.TypefaceSpan;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -54,32 +44,30 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.vianet.lyricstadka.Activityclass.SavedLyrics;
 import com.vianet.lyricstadka.Frag_Adaptor.RecycleAdaptorCategory;
-import com.vianet.lyricstadka.Frag_Adaptor.Suc_Cat_Frag_Adaptor;
 import com.vianet.lyricstadka.FragmentLyrics.SubCategory;
 import com.vianet.lyricstadka.network.AppControllerSingleton;
+import com.vianet.lyricstadka.network.ItemClickListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, ItemClickListener {
 
+    ProgressBar progressBar;
+    Toolbar toolbar;
+    SpannableString s;
+    ActionBar actionBar;
     private String url = "http://63.142.254.250/lyrics_panel/API/webservice.php?action=CategoryList";
     private ArrayList<Getter_Setter> category_name;
     private RecycleAdaptorCategory categoryAdaptor;
     private RecyclerView recyclerView;
     private TextView errorvolley;
     private ImageView refreshImage;
-    ProgressBar progressBar;
-    Toolbar toolbar;
-    SpannableString s;
-    ActionBar actionBar;
-    Typeface typeface;
-    private RelativeLayout conta;
+//    private RelativeLayout conta;
 
 
     @Override
@@ -118,7 +106,7 @@ public class MainActivity extends AppCompatActivity
         fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                if (fragmentManager.getBackStackEntryCount()>0) {
+                if (fragmentManager.getBackStackEntryCount() > 0) {
 
                     toggle.setDrawerIndicatorEnabled(false);
                     actionBar.setDisplayHomeAsUpEnabled(true);
@@ -141,48 +129,17 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
-
-
         //find resource id
         recyclerView = (RecyclerView) findViewById(R.id.main_recycle);
         errorvolley = (TextView) findViewById(R.id.Error_main);
-        refreshImage= (ImageView) findViewById(R.id.refresh_id_image);
+        refreshImage = (ImageView) findViewById(R.id.refresh_id_image);
         progressBar = (ProgressBar) findViewById(R.id.progresBarM);
-        conta = (RelativeLayout)
-                findViewById(R.id.conta);
+//        conta = (RelativeLayout) findViewById(R.id.conta);
 
         category_name = new ArrayList<>();
 
         //here we call api for Sub cetogory method
         makeCategoryRequest();
-
-        // here we handle recycle click action through activity
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getBaseContext(), recyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-
-                recyclerView.setVisibility(View.GONE);
-//                conta.setVisibility(View.VISIBLE);
-                Bundle bundle = new Bundle();
-                bundle.putString("idcat", category_name.get(position).getId());
-                bundle.putString("title",category_name.get(position).getText());
-                SubCategory obj = new SubCategory();
-                obj.setArguments(bundle);
-
-                FragmentTransaction fragtans = getSupportFragmentManager().beginTransaction();
-                fragtans.setCustomAnimations(R.anim.enter,R.anim.exit,R.anim.pop_enter,R.anim.pop_exit);
-                fragtans.replace(R.id.conta, obj);
-                fragtans.addToBackStack(null);
-                fragtans.commit();
-
-            }
-
-          /*  @Override
-            public void onLongClick(View view, int position) {
-
-            }*/
-        }));
 
         refreshImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,7 +149,6 @@ public class MainActivity extends AppCompatActivity
                 errorvolley.setVisibility(View.GONE);
             }
         });
-
     }
 
 
@@ -202,7 +158,6 @@ public class MainActivity extends AppCompatActivity
         progressBar.setVisibility(View.INVISIBLE);
 
     }
-
 
     // method for api call
     private void makeCategoryRequest() {
@@ -230,24 +185,38 @@ public class MainActivity extends AppCompatActivity
                             getSetObject.setId(categoryData.getString("id"));
                             category_name.add(getSetObject);
                         }
-                        int resId=R.anim.layout_animation_fall_down;
-                        LayoutAnimationController animation= AnimationUtils.loadLayoutAnimation(getBaseContext(),resId);
+
+                        int resId = R.anim.layout_animation_fall_down;
+                        LayoutAnimationController animation = null;
+
+                        try {
+                            animation = AnimationUtils.loadLayoutAnimation(getBaseContext(), resId);
+                        } catch (Resources.NotFoundException e) {
+                            e.printStackTrace();
+                        }
+
                         categoryAdaptor = new RecycleAdaptorCategory(getApplicationContext(), category_name);
                         recyclerView.setLayoutAnimation(animation);
                         recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+                        categoryAdaptor.setClickListener(MainActivity.this);
                         recyclerView.setAdapter(categoryAdaptor);
 
+
                     } catch (JSONException e) {
+
                         e.printStackTrace();
                         recyclerView.setVisibility(View.GONE);
                         errorvolley.setVisibility(View.VISIBLE);
                         refreshImage.setVisibility(View.VISIBLE);
                         errorvolley.setText(R.string.data_notfound);
+
                     }
                 } else {
+
                     errorvolley.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                     errorvolley.setText(R.string.data_notfound);
+
                 }
 
                 //handle visibility of progress bar after getting data
@@ -291,13 +260,9 @@ public class MainActivity extends AppCompatActivity
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }/* else if (!searchView.isIconified()){
-            searchView.setIconified(true);
-        }*/
-
-        else {
+        } else {
             super.onBackPressed();
-            if (getSupportFragmentManager().getBackStackEntryCount()<1){
+            if (getSupportFragmentManager().getBackStackEntryCount() < 1) {
 //                toolbar.setTitle(s);
 //                toolbar.setTitle("भक्ति संग्रह");
                 if (actionBar != null) {
@@ -386,66 +351,32 @@ public class MainActivity extends AppCompatActivity
 
     //this method is use for sharing this Application
     private void shareApllication() {
-            Intent i = new Intent(Intent.ACTION_SEND);
-            i.setType("text/plain");
-            String text = "Dear Devotees, In this app you will find All Aarti, Chalisa, Bhajan ,Mantra of all bhagwaan ji( Hindu God) in hindi font. You can share any content to your friend on a single click." + getString(R.string.app_name) + " app." + "\n\nDownload this at:";
-            String link = "http://play.google.com/store/apps/details?id=" + "com.bhakti.sangrah";
-            i.putExtra(Intent.EXTRA_TEXT, text + " " + link);
-            startActivity(Intent.createChooser(i, "Share link:"));
-    }
 
-    // class for handle recycler click event
-    class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
-        private ClickListener clicklistener;
-        private GestureDetector gestureDet;
-
-        public RecyclerTouchListener(Context context, final RecyclerView recyclerview, final ClickListener clickListener) {
-            this.clicklistener = clickListener;
-            Log.d("gajendra ", "constructor");
-            gestureDet = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
-                }
-
-            /*    @Override
-                public void onLongPress(MotionEvent e) {
-                    View child = recyclerview.findChildViewUnder(e.getX(), e.getY());
-                    if (child != null && clickListener != null) {
-                        clickListener.onLongClick(child, recyclerview.getChildPosition(child));
-                    }
-                }*/
-            });
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-            View child = rv.findChildViewUnder(e.getX(), e.getY());
-
-            if (child != null && clicklistener != null && gestureDet.onTouchEvent(e)) {
-                clicklistener.onClick(child, rv.getChildPosition(child));
-            }
-            Log.d("gajendra ", "onInterceptTouchEvent" + e);
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-            Log.d("gajendra ", "onTouchEvent" + e);
-
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-        }
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("text/plain");
+        String link = "http://play.google.com/store/apps/details?id=" + "com.bhakti.sangrah";
+        i.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_details) + " \n " + link);
+        startActivity(Intent.createChooser(i, "Share link:"));
 
     }
 
-    public static interface ClickListener {
-        public void onClick(View view, int position);
+    @Override
+    public void onClick(int position) {
 
-/*        public void onLongClick(View view, int position);*/
+        recyclerView.setVisibility(View.GONE);
+//                conta.setVisibility(View.VISIBLE);
+        Bundle bundle = new Bundle();
+        bundle.putString("idcat", category_name.get(position).getId());
+        bundle.putString("title", category_name.get(position).getText());
+        SubCategory obj = new SubCategory();
+        obj.setArguments(bundle);
+
+        FragmentTransaction fragtans = getSupportFragmentManager().beginTransaction();
+        fragtans.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+        fragtans.replace(R.id.conta, obj);
+        fragtans.addToBackStack(null);
+        fragtans.commit();
+
     }
 
 }

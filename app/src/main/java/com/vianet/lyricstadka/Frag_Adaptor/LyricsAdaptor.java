@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.vianet.lyricstadka.Getter_Setter;
 import com.vianet.lyricstadka.R;
+import com.vianet.lyricstadka.network.ItemClickListener;
 
 import java.util.ArrayList;
 
@@ -21,35 +22,38 @@ import java.util.ArrayList;
 //this adaptor is used for LyricsCard Fragment
 
 public class LyricsAdaptor extends RecyclerView.Adapter<LyricsAdaptor.MyViewHolder> {
-    private Context context;
     public ArrayList<Getter_Setter> lyricsList;
+    private Context context;
+    private ItemClickListener clickListener;
 
+    public LyricsAdaptor(Context context, ArrayList<Getter_Setter> lyricsList) {
+        this.context = context;
+        this.lyricsList = lyricsList;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView lyricsText;
-        public MyViewHolder(View itemView) {
-            super(itemView);
-            lyricsText= (TextView) itemView.findViewById(R.id.lyrics_text);
-            Typeface customFonts = Typeface.createFromAsset(context.getAssets(), "fonts/gaj.ttf");
-            lyricsText.setTypeface(customFonts);
-        }
     }
 
-    public LyricsAdaptor(Context context , ArrayList<Getter_Setter> lyricsList){
-        this.context=context;
-        this.lyricsList=lyricsList;
-
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.clickListener = itemClickListener;
     }
 
     @Override
     public LyricsAdaptor.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.lyrics_frag_design,parent,false);
-        return new MyViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.lyrics_frag_design, parent, false);
+        final MyViewHolder holder = new MyViewHolder(view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (clickListener != null) {
+                    clickListener.onClick(holder.getAdapterPosition());
+                }
+            }
+        });
+        return holder;
     }
 
     @Override
     public void onBindViewHolder(LyricsAdaptor.MyViewHolder holder, int position) {
-        Getter_Setter getter_setter=lyricsList.get(position);
+        Getter_Setter getter_setter = lyricsList.get(position);
         holder.lyricsText.setText(getter_setter.getText());
 
     }
@@ -57,5 +61,16 @@ public class LyricsAdaptor extends RecyclerView.Adapter<LyricsAdaptor.MyViewHold
     @Override
     public int getItemCount() {
         return lyricsList.size();
+    }
+
+    public class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView lyricsText;
+
+        public MyViewHolder(View itemView) {
+            super(itemView);
+            lyricsText = (TextView) itemView.findViewById(R.id.lyrics_text);
+            Typeface customFonts = Typeface.createFromAsset(context.getAssets(), "fonts/gaj.ttf");
+            lyricsText.setTypeface(customFonts);
+        }
     }
 }

@@ -6,5 +6,7 @@
     <color name="dayBackground">#fffefe</color>
     <color name="black">#FF050505</color>
     <color name="textColor">#ffffff</color>
+    <color name="bg_row_background">#fa315b</color>
+
 
 </resources>

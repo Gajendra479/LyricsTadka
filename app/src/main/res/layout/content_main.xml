@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:id="@+id/content_main"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/dayBackground"
@@ -11,58 +10,51 @@
     tools:context="com.vianet.lyricstadka.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-
-
     <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/main_recycle"
             android:layout_width="match_parent"
-            android:id="@+id/container"
             android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:id="@+id/main_recycle"
-                android:layout_height="match_parent"
-               >
-
-            </android.support.v7.widget.RecyclerView>
-
-
-
+        </android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
-
     <RelativeLayout
-        android:layout_width="match_parent"
         android:id="@+id/conta"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     </RelativeLayout>
 
     <ImageView
-        android:layout_width="@dimen/refresh_image_size"
         android:id="@+id/refresh_id_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone"
         android:background="@drawable/ic_refresh_image"
-        android:layout_height="@dimen/refresh_image_size"/>
+        android:visibility="gone" />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:layout_margin="5dp"
-        android:layout_below="@+id/refresh_id_image"
         android:id="@+id/Error_main"
-        android:visibility="gone"
-        android:layout_height="wrap_content"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/refresh_id_image"
+        android:layout_centerInParent="true"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:visibility="gone" />
 
 
     <ProgressBar
-        android:layout_width="match_parent"
         android:id="@+id/progresBarM"
-        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:indeterminate="true"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_height="15dp"/>
+        android:visibility="gone" />
 
 </RelativeLayout>

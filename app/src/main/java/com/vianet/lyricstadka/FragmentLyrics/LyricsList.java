@@ -1,8 +1,6 @@
 package com.vianet.lyricstadka.FragmentLyrics;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,9 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -32,11 +28,10 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.vianet.lyricstadka.Frag_Adaptor.LyricsAdaptor;
-import com.vianet.lyricstadka.Frag_Adaptor.RecycleAdaptorCategory;
-import com.vianet.lyricstadka.Frag_Adaptor.Suc_Cat_Frag_Adaptor;
 import com.vianet.lyricstadka.Getter_Setter;
 import com.vianet.lyricstadka.R;
 import com.vianet.lyricstadka.network.AppControllerSingleton;
+import com.vianet.lyricstadka.network.ItemClickListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,10 +39,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class LyricsList extends Fragment {
+public class LyricsList extends Fragment implements ItemClickListener {
 
-
-    private OnFragmentInteractionListener mListener;
+    public String urlcard;
+    String sub_cat_name;
     private RecyclerView recyclerView;
     private TextView errorvolley;
     private int currentPage = 1;
@@ -60,23 +55,15 @@ public class LyricsList extends Fragment {
     private int total_num_page;
     private ProgressBar progressbar;
     private String url;
-    public String urlcard;
     private LyricsAdaptor lyrics_adap;
-    String sub_cat_name;
     private ImageView refreshImage;
     private String titlefortitle;
+    private ProgressBar bottomProgreshBar;
 
     public LyricsList() {
         // Required empty public constructor
     }
 
-
-    /*   // TODO: Rename and change types and number of parameters
-       public static LyricsList newInstance(String param1, String param2) {
-           LyricsList fragment = new LyricsList();
-           return fragment;
-       }
-   */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +72,7 @@ public class LyricsList extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_lyrics_list, container, false);
@@ -98,51 +85,23 @@ public class LyricsList extends Fragment {
         sub_cat_id = bundle.getString("idsubCat");
         cat_id = bundle.getString("idCat");
 
-
         recyclerView = (RecyclerView) view.findViewById(R.id.lyricsCatRecycle);
         errorvolley = (TextView) view.findViewById(R.id.error_text);
         progressbar = (ProgressBar) view.findViewById(R.id.progresBarL);
         refreshImage = (ImageView) view.findViewById(R.id.lyrics_list_refresh);
+        bottomProgreshBar = (ProgressBar) view.findViewById(R.id.bottamBarProgressBar);
 
         //make call for lyrics
         if (lyrics_list == null) {
             makeLyricsRequest(1);
+
         } else {
             progressbar.setVisibility(View.GONE);
             lyrics_adap = new LyricsAdaptor(getContext(), lyrics_list);
             recyclerView.setLayoutManager(layoutmanager);
             recyclerView.setAdapter(lyrics_adap);
+            lyrics_adap.setClickListener(this);
         }
-
-
-        recyclerView.addOnItemTouchListener(new RecycleviewTouchListener(getContext(), recyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                LyricsCard obj = new LyricsCard();
-
-                // this url is used for fetching lyrics in LyricsCard Fragment
-                urlcard = "http://63.142.254.250/lyrics_panel/API/webservice.php?action=LyricsRead&id=";
-
-                //here we send data to Lyricscard Fragment
-                Bundle bundle1 = new Bundle();
-                bundle1.putString("sub_cat_name1", sub_cat_name);
-                bundle1.putString("lyrics", lyrics_list.get(position).getText());
-                bundle1.putString("id", urlcard + lyrics_list.get(position).getId());
-                obj.setArguments(bundle1);
-
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                ft.replace(R.id.conta, obj);
-                ft.addToBackStack(null);
-                ft.commit();
-
-            }
-
-         /*   @Override
-            public void onLongClick(View view, int position) {
-
-            }*/
-        }));
 
         //here we handle the pagination of recycleview only 9 item show in one page
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -153,21 +112,23 @@ public class LyricsList extends Fragment {
 
 
                 int c = Integer.parseInt(count);
+
                 if (c % item_per_page == 0) {
                     total_num_page = c / item_per_page;
+
                 } else {
                     total_num_page = c / item_per_page + 1;
+
                 }
-                int visibleItemCount = layoutmanager.getChildCount();
-                int totalItemCount = layoutmanager.getItemCount();
-                int firstVisibleItemPosition = layoutmanager.findFirstVisibleItemPosition();
 
+                int lastvisibleitem = layoutmanager.findLastCompletelyVisibleItemPosition();
+                if (!progressbar.isShown()) {
+                    if (currentPage < total_num_page) {
+                        if (lastvisibleitem == lyrics_list.size() - 1) {
+                            currentPage++;
+                            makeLyricsRequestPagination(currentPage);
 
-                if (currentPage < total_num_page) {
-                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
-                        currentPage++;
-                        makeLyricsRequestPagination(currentPage);
-//                        makeLyricsRequest(currentPage);
+                        }
                     }
                 }
             }
@@ -183,6 +144,7 @@ public class LyricsList extends Fragment {
             @Override
             public void onClick(View v) {
                 makeLyricsRequest(1);
+
                 refreshImage.setVisibility(View.GONE);
                 errorvolley.setVisibility(View.GONE);
             }
@@ -195,6 +157,8 @@ public class LyricsList extends Fragment {
 
         url = "http://63.142.254.250/lyrics_panel/API/webservice.php?action=LyricsList&page=" + currentPage + "&cat=" + cat_id + "&subcat=" + sub_cat_id;
 
+        Log.d("cat id ", cat_id);
+        Log.d("sub cat id: ", sub_cat_id);
         progressbar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
 
@@ -211,9 +175,10 @@ public class LyricsList extends Fragment {
 
                         JSONObject object = new JSONObject(response);
                         count = object.getString("count");
-                        if (!count.isEmpty()) {
-                            JSONArray jsonArray = object.getJSONArray("LyricsList");
+                        if (!count.equals("0")) {
 
+
+                            JSONArray jsonArray = object.getJSONArray("LyricsList");
 
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject lyricsData = jsonArray.getJSONObject(i);
@@ -224,19 +189,20 @@ public class LyricsList extends Fragment {
                             }
 
                             if (currentPage == 1) {
-
-                                int resId = R.anim.layout_animation_fall_down;
-                                LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(getContext(), resId);
+                                LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(AppControllerSingleton.getMinstance(), R.anim.layout_animation_fall_down);
                                 lyrics_adap = new LyricsAdaptor(getContext(), lyrics_list);
-                                recyclerView.setLayoutAnimation(animation);
-
+                                if (animation != null) {
+                                    recyclerView.setLayoutAnimation(animation);
+                                }
                                 recyclerView.setLayoutManager(layoutmanager);
                                 recyclerView.setAdapter(lyrics_adap);
+                                lyrics_adap.setClickListener(LyricsList.this);
+
                             } else
                                 lyrics_adap.notifyDataSetChanged();
                         } else {
+
                             errorvolley.setVisibility(View.VISIBLE);
-//                        refreshImage.setVisibility(View.VISIBLE);
                             errorvolley.setText(R.string.data_notfound);
 
                         }
@@ -256,15 +222,8 @@ public class LyricsList extends Fragment {
                     errorvolley.setText(R.string.data_notfound);
                 }
 
-
                 progressbar.setVisibility(View.GONE);
 
-                for (int i = 0; i < lyrics_list.size(); i++) {
-                    Log.d("Respone Lyrics ", lyrics_list.get(i).getText());
-                    Log.d("Count ", LyricsList.this.count);
-                    Log.d(" page count ","lyrics list");
-
-                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -294,12 +253,16 @@ public class LyricsList extends Fragment {
 
     }
 
-    private void makeLyricsRequestPagination(final int currentPage) {
+    private void makeLyricsRequestPagination(int currentPage) {
 
+//        Log.d("page", String.valueOf(currentPage));
         url = "http://63.142.254.250/lyrics_panel/API/webservice.php?action=LyricsList&page=" + currentPage + "&cat=" + cat_id + "&subcat=" + sub_cat_id;
 
-        progressbar.setVisibility(View.VISIBLE);
+//        progressbar.setVisibility(View.VISIBLE);
+        bottomProgreshBar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
+
+//        Log.d("makeLyricsRequestPagina","makeLyricsRequestPagination");
 
         StringRequest stringreq = new StringRequest(url, new Response.Listener<String>() {
             @Override
@@ -323,17 +286,22 @@ public class LyricsList extends Fragment {
                                 getSet.setId(lyricsData.getString("id"));
                                 lyrics_list.add(getSet);
                             }
-
+                            lyrics_adap.notifyDataSetChanged();
+                            lyrics_adap.setClickListener(LyricsList.this);
+                            bottomProgreshBar.setVisibility(View.GONE);
                         } else {
                             Toast.makeText(getContext(), "Error in loading data", Toast.LENGTH_SHORT).show();
+                            bottomProgreshBar.setVisibility(View.GONE);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                         Toast.makeText(getContext(), "Error in loading data", Toast.LENGTH_SHORT).show();
+                        bottomProgreshBar.setVisibility(View.GONE);
                     }
 
                 } else {
                     Toast.makeText(getContext(), "Error in loading data", Toast.LENGTH_SHORT).show();
+                    bottomProgreshBar.setVisibility(View.GONE);
                 }
                 progressbar.setVisibility(View.GONE);
             }
@@ -341,73 +309,34 @@ public class LyricsList extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
 
-                progressbar.setVisibility(View.GONE);
+//                progressbar.setVisibility(View.GONE);
+                bottomProgreshBar.setVisibility(View.GONE);
                 Toast.makeText(getContext(), "Error in loading data", Toast.LENGTH_SHORT).show();
             }
         });
         AppControllerSingleton.getMinstance().addToRequestQueue(stringreq);
     }
 
-    //class for handle recycler click event
-    class RecycleviewTouchListener implements RecyclerView.OnItemTouchListener {
-        private ClickListener clickListener;
-        private GestureDetector gestureDet;
+    @Override
+    public void onClick(int position) {
+        LyricsCard obj = new LyricsCard();
+        // this url is used for fetching lyrics in LyricsCard Fragment
+        urlcard = "http://63.142.254.250/lyrics_panel/API/webservice.php?action=LyricsRead&id=";
+        //here we send data to Lyricscard Fragment
+        Bundle bundle1 = new Bundle();
+        bundle1.putString("sub_cat_name1", sub_cat_name);
+        bundle1.putString("lyrics", lyrics_list.get(position).getText());
+        bundle1.putString("id", urlcard + lyrics_list.get(position).getId());
+        obj.setArguments(bundle1);
 
-        RecycleviewTouchListener(Context context, final RecyclerView recyclerview, final ClickListener clicklistener) {
-            this.clickListener = clicklistener;
-            gestureDet = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
-                }
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+        ft.replace(R.id.conta, obj);
+        ft.addToBackStack(null);
+        ft.commit();
 
-             /*   @Override
-                public void onLongPress(MotionEvent e) {
-                    View view=recyclerview.findChildViewUnder(e.getX(),e.getY());
-                    if (view!=null && clicklistener!=null){
-                        clicklistener.onLongClick(view,recyclerview.getChildPosition(view));
-                    }
-                }*/
-            });
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-            View view = rv.findChildViewUnder(e.getX(), e.getY());
-            if (view != null && clickListener != null && gestureDet.onTouchEvent(e)) {
-                clickListener.onClick(view, rv.getChildPosition(view));
-            }
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-        }
     }
 
-
-    public interface ClickListener {
-        void onClick(View view, int position);
-
-//        public void onLongClick(View view ,int position);
-    }
-
-
-
-
-/*
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }*/
 
     @Override
     public void onAttach(Context context) {
@@ -415,21 +344,14 @@ public class LyricsList extends Fragment {
 
         Bundle bundle = getArguments();
         titlefortitle = bundle.getString("sub_cat_name");
-
-
-      /*  if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
         try {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(titlefortitle);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(titlefortitle);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -438,22 +360,9 @@ public class LyricsList extends Fragment {
 
     @Override
     public void onDetach() {
+
+        AppControllerSingleton.getMinstance().getmRequestQueue().cancelAll(true);
         super.onDetach();
-        mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 }

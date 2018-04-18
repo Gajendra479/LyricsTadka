@@ -12,8 +12,21 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Error_TimeOut">Connection Could not be established</string>
     <string name="AuthFailure">Connection Auth Failure</string>
-    <string name="Server_Error">Server Error Occured</string>
-    <string name="Network">Network Issue Occured</string>
+    <string name="Server_Error">Server Error Occurred</string>
+    <string name="Network">Network Issue Occurred</string>
     <string name="Parsing_error">Data Parsing Problem</string>
-    <string name="data_notfound">No Data Awailable</string>
+    <string name="app_link">http://play.google.com/store/apps/details?id=com.bhakti.sangrah</string>
+    <string name="data_notfound">No Data Available</string>
+    <string name="app_details">This app makes you feel the divine vibrations around by reading
+these amazing divine devotional matters.
+
+Bhakti Sangrah app provides different devotional matters under different
+categories for devotees at single place.
+Get this App for a very blissful divine experience and easy-to-read format on
+any mobile device!
+        \n
+
+        Download at this :-
+\n
+    </string>
 </resources>

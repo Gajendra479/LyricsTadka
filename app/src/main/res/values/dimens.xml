@@ -8,7 +8,7 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="app_bar_height">70dp</dimen>
     <dimen name="text_margin">16dp</dimen>
-    <dimen name="text_size">18dp</dimen>
+    <dimen name="text_size">18sp</dimen>
     <dimen name="recycle_text_size">22dp</dimen>
     <dimen name="refresh_image_size">40dp</dimen>
 </resources>
