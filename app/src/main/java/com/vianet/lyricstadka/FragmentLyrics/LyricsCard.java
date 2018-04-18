@@ -257,6 +257,7 @@ public class LyricsCard extends Fragment implements GestureDetector.OnGestureLis
         });
 
 
+
         return view;
     }
 
