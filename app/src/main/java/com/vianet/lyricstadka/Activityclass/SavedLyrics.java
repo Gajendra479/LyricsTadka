@@ -12,8 +12,11 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vianet.lyricstadka.DataBase.DatabaseHandler;
 import com.vianet.lyricstadka.Frag_Adaptor.SavedAdaptor;
@@ -25,7 +28,7 @@ import com.vianet.lyricstadka.network.RecyclerItemTouchHelper;
 
 import java.util.ArrayList;
 
-public class SavedLyrics extends AppCompatActivity implements ItemClickListener, RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
+public class SavedLyrics extends AppCompatActivity implements /*ItemClickListener,*/ RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
     ArrayList<Getter_Setter> savedlist;
     SavedAdaptor savedAdaptor;
     DatabaseHandler helper;
@@ -37,7 +40,7 @@ public class SavedLyrics extends AppCompatActivity implements ItemClickListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved_lyrics);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         actionBar = getSupportActionBar();
@@ -45,12 +48,17 @@ public class SavedLyrics extends AppCompatActivity implements ItemClickListener,
         actionBar.setTitle("Favorite Lyrics");
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getBaseContext());
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.saved_recycle_view);
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinateLayout);
+        RecyclerView recyclerView = findViewById(R.id.saved_recycle_view);
+        coordinatorLayout = findViewById(R.id.coordinateLayout);
+        TextView datanotavailable = findViewById(R.id.saved_data_not_available);
 
         helper = new DatabaseHandler(getBaseContext());
 
         savedlist = helper.selectData();
+
+        if (savedlist.size()>0){
+            datanotavailable.setVisibility(View.GONE);
+        }
         LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(AppControllerSingleton.getMinstance(), R.anim.layout_animation_fall_down);
 
         savedAdaptor = new SavedAdaptor(this, savedlist, getSupportFragmentManager());
@@ -59,7 +67,7 @@ public class SavedLyrics extends AppCompatActivity implements ItemClickListener,
         }
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(savedAdaptor);
-        savedAdaptor.setClickListener(this);
+//        savedAdaptor.setClickListener(this);
 
         // adding item touch helper
         // only ItemTouchHelper.LEFT added to detect Right to Left swipe
@@ -95,14 +103,14 @@ public class SavedLyrics extends AppCompatActivity implements ItemClickListener,
         super.onDestroy();
         finish();
     }
-
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_saved_lyrics, menu);
         return super.onCreateOptionsMenu(menu);
 
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -123,12 +131,12 @@ public class SavedLyrics extends AppCompatActivity implements ItemClickListener,
         super.onBackPressed();
     }
 
-    @Override
+/*    @Override
     public void onClick(int position) {
         helper.deleteDataFromLyrics(savedlist.get(position).getText());
         savedlist.remove(position);
         savedAdaptor.notifyDataSetChanged();
-    }
+    }*/
 
     @Override
     public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction, final int position) {

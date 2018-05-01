@@ -69,11 +69,6 @@
                 android:layout_margin="15dp"
                 android:background="@color/textColor" />
 
-            <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:gravity="center">-->
-
                 <TextView
                     android:id="@+id/lyricsCard_Lyrics_Description"
                     android:layout_width="match_parent"
@@ -82,13 +77,12 @@
                     android:paddingBottom="60dp"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:paddingTop="60dp"
+                    android:paddingTop="70dp"
                     android:textColor="@color/textColor"
                     android:textSize="@dimen/text_size"
                     android:textStyle="bold"
                     android:textIsSelectable="true"/>
 
-            <!--</LinearLayout>-->
 
         </RelativeLayout>
 

@@ -30,10 +30,9 @@ import java.util.ArrayList;
 public class SavedAdaptor extends RecyclerView.Adapter<SavedAdaptor.MyViewHolder> {
     private Context context;
     private ArrayList<Getter_Setter> savedLyrics;
-    private DatabaseHandler helper;
 
     private FragmentManager fragmentManager;
-    private ItemClickListener clickListener;
+//    private ItemClickListener clickListener;
 
 
     public SavedAdaptor(Context context, ArrayList<Getter_Setter> savedlist, FragmentManager fragmentManager) {
@@ -41,13 +40,13 @@ public class SavedAdaptor extends RecyclerView.Adapter<SavedAdaptor.MyViewHolder
         this.context = context;
         this.savedLyrics = savedlist;
         this.fragmentManager = fragmentManager;
-        helper = new DatabaseHandler(context);
+//        DatabaseHandler helper = new DatabaseHandler(context);
 
     }
 
-    public void setClickListener(ItemClickListener itemClickListener) {
+  /*  public void setClickListener(ItemClickListener itemClickListener) {
         this.clickListener = itemClickListener;
-    }
+    }*/
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -111,15 +110,15 @@ public class SavedAdaptor extends RecyclerView.Adapter<SavedAdaptor.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public RelativeLayout viewForground, viewBackground;
-        ImageView delete_icon;
+//        ImageView delete_icon;
         private TextView savedLyricsText;
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            savedLyricsText = (TextView) itemView.findViewById(R.id.saved_Lyrics_text);
+            savedLyricsText = itemView.findViewById(R.id.saved_Lyrics_text);
 //            delete_icon= (ImageView) itemView.findViewById(R.id.delete_icon);
-            viewForground = (RelativeLayout) itemView.findViewById(R.id.view_foreground);
-            viewBackground = (RelativeLayout) itemView.findViewById(R.id.view_background);
+            viewForground = itemView.findViewById(R.id.view_foreground);
+            viewBackground = itemView.findViewById(R.id.view_background);
             Typeface customFonts = Typeface.createFromAsset(context.getAssets(), "fonts/gaj.ttf");
             savedLyricsText.setTypeface(customFonts);
         }

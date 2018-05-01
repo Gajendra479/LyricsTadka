@@ -256,8 +256,6 @@ public class LyricsCard extends Fragment implements GestureDetector.OnGestureLis
             }
         });
 
-
-
         return view;
     }
 
@@ -288,7 +286,6 @@ public class LyricsCard extends Fragment implements GestureDetector.OnGestureLis
         rootview.setVisibility(View.VISIBLE);
         scrollView.setVisibility(View.VISIBLE);
         fab.setVisibility(View.VISIBLE);
-        fabSaved.setVisibility(View.VISIBLE);
 
         Integer image = dayImageArray[r.nextInt(dayImageArray.length)];
         rootview.setBackgroundResource(image);

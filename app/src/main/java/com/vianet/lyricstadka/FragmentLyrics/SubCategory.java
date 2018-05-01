@@ -76,7 +76,8 @@ public class SubCategory extends Fragment implements ItemClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_sub_category, container, false);
+//        View view = inflater.inflate(R.layout.fragment_sub_category, container, false);
+        View view = inflater.inflate(R.layout.fragment_lyrics_list, container, false);
 
         //here we get cat id from main activity for hitting url category wise
         Bundle bundle = getArguments();
@@ -84,10 +85,15 @@ public class SubCategory extends Fragment implements ItemClickListener {
 //        Log.d("CAT_ID_IN_SUB_CAT", cat_id);
         url = "http://63.142.254.250/lyrics_panel/API/webservice.php?action=SubCategoryList&catid=" + cat_id;
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.subcategoryRecy);
+        /*recyclerView = (RecyclerView) view.findViewById(R.id.subcategoryRecy);
         errorvolley = (TextView) view.findViewById(R.id.Error_text);
         progressBar = (ProgressBar) view.findViewById(R.id.progresBarS);
-        refreshImage = (ImageView) view.findViewById(R.id.sub_cat_refresh);
+        refreshImage = (ImageView) view.findViewById(R.id.sub_cat_refresh);*/
+
+        recyclerView = (RecyclerView) view.findViewById(R.id.lyricsCatRecycle);
+        errorvolley = (TextView) view.findViewById(R.id.error_text);
+        progressBar = (ProgressBar) view.findViewById(R.id.progresBarL);
+        refreshImage = (ImageView) view.findViewById(R.id.lyrics_list_refresh);
 
 
         if (sub_cat_list == null) {

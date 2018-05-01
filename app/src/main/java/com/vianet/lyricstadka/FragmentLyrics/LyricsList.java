@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -157,8 +156,8 @@ public class LyricsList extends Fragment implements ItemClickListener {
 
         url = "http://63.142.254.250/lyrics_panel/API/webservice.php?action=LyricsList&page=" + currentPage + "&cat=" + cat_id + "&subcat=" + sub_cat_id;
 
-        Log.d("cat id ", cat_id);
-        Log.d("sub cat id: ", sub_cat_id);
+//        Log.d("cat id ", cat_id);
+//        Log.d("sub cat id: ", sub_cat_id);
         progressbar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
 

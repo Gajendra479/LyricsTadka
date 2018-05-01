@@ -30,8 +30,8 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Typeface customFonts = Typeface.createFromAsset(getAssets(), "fonts/gaj.ttf");
@@ -94,13 +94,13 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = findViewById(R.id.drawer_layout);
         final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
@@ -130,10 +130,15 @@ public class MainActivity extends AppCompatActivity
         });
 
         //find resource id
-        recyclerView = (RecyclerView) findViewById(R.id.main_recycle);
-        errorvolley = (TextView) findViewById(R.id.Error_main);
-        refreshImage = (ImageView) findViewById(R.id.refresh_id_image);
-        progressBar = (ProgressBar) findViewById(R.id.progresBarM);
+  /*      recyclerView = findViewById(R.id.main_recycle);
+        errorvolley = findViewById(R.id.Error_main);
+        refreshImage = findViewById(R.id.refresh_id_image);
+        progressBar = findViewById(R.id.progresBarM);*/
+
+        recyclerView = findViewById(R.id.lyricsCatRecycle);
+        errorvolley = findViewById(R.id.error_text);
+        refreshImage = findViewById(R.id.lyrics_list_refresh);
+        progressBar = findViewById(R.id.progresBarL);
 //        conta = (RelativeLayout) findViewById(R.id.conta);
 
         category_name = new ArrayList<>();
@@ -255,7 +260,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         //handle navigation drawer open or close and search view iconofied
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
 //        SearchView searchView= (SearchView) findViewById(R.id.search_action);
 
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -273,7 +278,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
+  /*  @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
@@ -290,6 +295,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == android.R.id.home) {
+            Toast.makeText(this, "t", Toast.LENGTH_SHORT).show();
 
             onBackPressed();
             return true;
@@ -297,13 +303,13 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
+*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         switch (item.getItemId()) {
 
             case R.id.nav_home:
@@ -329,7 +335,7 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.nav_rate_us:
 
-                Uri uri = Uri.parse("market://details?id=" + getBaseContext().getPackageName());
+                Uri uri = Uri.parse("market://details?id=com.bhakti.sangrah");
                 Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
                 // To count with Play market backstack, After pressing back button,
                 // to taken back to our application, we need to add following flags to intent.
@@ -341,7 +347,7 @@ public class MainActivity extends AppCompatActivity
                     startActivity(goToMarket);
                 } catch (ActivityNotFoundException a) {
                     startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("http://play.google.com/store/apps/details?id=" + getBaseContext().getPackageName())));
+                            Uri.parse(getString(R.string.app_link))));
                 }
                 break;
         }
@@ -354,8 +360,7 @@ public class MainActivity extends AppCompatActivity
 
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("text/plain");
-        String link = "http://play.google.com/store/apps/details?id=" + "com.bhakti.sangrah";
-        i.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_details) + " \n " + link);
+        i.putExtra(Intent.EXTRA_TEXT, getString(R.string.app_details) + " \n " + getString(R.string.app_link));
         startActivity(Intent.createChooser(i, "Share link:"));
 
     }
